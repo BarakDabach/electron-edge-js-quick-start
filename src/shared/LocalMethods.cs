@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -44,6 +46,24 @@ namespace QuickStart
             {
                 store.Close();
             }
+        }
+
+
+        public async Task<object> TestWithSqlDb(dynamic input)
+        {
+            var tableName = "adapters";
+            SqlDataAdapter select = new SqlDataAdapter("select * from adapters order by idName",
+                "Data Source=(localdb)\\Local;Initial Catalog=Octopus;Integrated Security=True");
+            DataSet dataSet = new DataSet(tableName);
+            select.Fill(dataSet, tableName);
+            var adaptersTable = dataSet.Tables[0];
+            var sourcesNames = new List<string>();
+            foreach (DataRow a_row in adaptersTable.Rows)
+            {
+                var adapter_class = a_row["AdapterClassName"].ToString();
+                sourcesNames.Add(a_row["sourceName"].ToString());
+            }
+            return string.Join(",",sourcesNames);
         }
     }
 }

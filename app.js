@@ -52,6 +52,12 @@ var handleException = edge.func({
     methodName: 'ThrowException'
 });
 
+var testDb = edge.func({
+    assemblyFile: baseDll,
+    typeName: localTypeName,
+    methodName: 'TestWithSqlDb'
+});
+
 var getInlinePerson = edge.func({
     source: function () {/* 
         using System.Threading.Tasks;
@@ -83,6 +89,11 @@ var getInlinePerson = edge.func({
 });
 
 exports.run = function (window) {
+
+    testDb({},function(error,result){
+        if (error) throw error;
+        window.webContents.send("fromMain", 'testDb', result);
+    })
     getInlinePerson({name: 'Peter Smith', email: 'peter.smith@electron-edge-js-quick-start.com', age: 30}, function(error, result) {
         if (error) throw error;
         window.webContents.send("fromMain", 'getItem', JSON.stringify( result, null, 2 ));
